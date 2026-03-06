@@ -1,776 +1,592 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>DASHBOARD REFRESHMENT TRAINING</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trusmiverse - Dashboard HR Onboarding</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        :root { font-size: 16px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; overflow-x: hidden; background: #F8FAFC; color: #1e293b; }
         
-        :root {
-            --primary: #0f172a;
-            --accent: #2563eb;
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: var(--bg-gradient);
-            color: #1e293b;
-            letter-spacing: -0.01em;
-            margin: 0;
-            overflow-x: hidden;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        @media (max-width: 640px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-
-        .card-stat {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-right: 4px solid #cbd5e1; /* Shadow effect border */
-            border-bottom: 2px solid #e2e8f0;
-            border-radius: 20px;
-            padding: 1.25rem;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            height: 100%;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .card-stat:hover {
-            transform: translateY(-5px);
-            border-color: #2563eb;
-            border-right-color: #1d4ed8;
-            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.15);
-        }
-
-        /* Specific border colors for categories */
-        .card-stat.underperform:hover { border-right-color: #e11d48; border-color: #f43f5e; }
-        .card-stat.tna:hover { border-right-color: #2563eb; border-color: #3b82f6; }
-        .card-stat.materi:hover { border-right-color: #d97706; border-color: #f59e0b; }
-        .card-stat.approved:hover { border-right-color: #9333ea; border-color: #a855f7; }
-        .card-stat.implemented:hover { border-right-color: #059669; border-color: #10b981; }
-        .card-stat.growth:hover { border-right-color: #4f46e5; border-color: #6366f1; }
-
-        .table-wrapper {
-            background: #fdfdfe;
-            border: 2px solid #f1f5f9;
-            border-radius: 24px;
-            overflow: hidden;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .table-scroll {
-            overflow-y: auto;
-            max-height: 500px;
-            position: relative;
-        }
-
-        .table-custom {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .table-custom thead th {
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            background-color: #f8fafc;
-            color: #64748b;
-            font-weight: 800;
-            font-size: 10px;
-            text-transform: uppercase;
-            padding: 14px 12px;
-            border-bottom: 2px solid #f1f5f9;
-            border-right: 1px solid #f1f5f9;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: background 0.2s;
-            text-align: left;
-        }
-
-        .table-custom thead th:hover { background-color: #f1f5f9; }
-
-        .table-custom td { 
-            padding: 12px; 
-            font-size: 11px; 
-            border: 1px solid #f1f5f9;
-            vertical-align: middle;
-            background-color: white;
-            color: #334155;
-        }
-
-        .circle-container { width: 160px; height: 160px; position: relative; }
-        .circle-bg { fill: none; stroke: #f1f5f9; stroke-width: 12; }
-        .circle-progress { 
-            fill: none; stroke: #2563eb; stroke-width: 12; 
-            stroke-linecap: round; transition: stroke-dashoffset 1.5s ease;
-        }
-
-        .btn-wa {
-            background: #25d366;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        .btn-wa:hover { background: #22c35e; }
-
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-track { background: #f8fafc; }
+        .hover-lift { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .hover-lift:hover { transform: translateY(-8px) scale(1.01); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
         
-        .filter-select, .filter-input {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 8px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            outline: none;
-            transition: all 0.2s;
-        }
-        .filter-select:focus, .filter-input:focus { border-color: #2563eb; }
+        .funnel-step { transition: all 0.3s ease; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08)); cursor: pointer; }
+        .funnel-container:hover .funnel-step { opacity: 0.7; }
+        .funnel-container .funnel-step:hover { opacity: 1; transform: scale(1.05); z-index: 10; }
+        
+        .gauge-container { position: relative; width: 240px; height: 120px; overflow: hidden; cursor: pointer; transition: transform 0.3s ease; }
+        .gauge-container:hover { transform: scale(1.05); }
+        .gauge-bg { width: 240px; height: 240px; border-radius: 50%; border: 20px solid #f1f5f9; border-bottom-color: transparent; border-right-color: transparent; transform: rotate(45deg); }
+        .gauge-fill { position: absolute; top: 0; left: 0; width: 240px; height: 240px; border-radius: 50%; border: 20px solid transparent; border-bottom-color: #10b981; border-left-color: #10b981; transform: rotate(var(--fill-rotation, -45deg)); transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1); }
+        .gauge-needle { position: absolute; bottom: 0; left: 50%; width: 3px; height: 80px; background: #1e293b; transform-origin: bottom center; transform: translateX(-50%) rotate(var(--needle-rotation, -90deg)); transition: transform 1.5s cubic-bezier(0.65, 0, 0.35, 1); border-radius: 4px; z-index: 10; }
+        .gauge-center { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: #1e293b; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 20; }
+        
+        .bar-3d-wrapper { perspective: 1000px; height: 100%; display: flex; align-items: flex-end; justify-content: center; width: 100%; cursor: pointer; }
+        .bar-3d-box { position: relative; width: 24px; background: #2563eb; transform-style: preserve-3d; transform: rotateY(-20deg); transition: all 0.5s ease; }
+        .bar-3d-box::before { content: ''; position: absolute; top: 0; left: 100%; width: 8px; height: 100%; background: #1d4ed8; transform-origin: left; transform: rotateY(90deg); }
+        .bar-3d-box::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: #3b82f6; transform-origin: bottom; transform: rotateX(90deg) translateY(-8px); }
+        
+        .bar-pink .bar-3d-box { background: #db2777; }
+        .bar-pink .bar-3d-box::before { background: #be185d; }
+        .bar-pink .bar-3d-box::after { background: #f472b6; }
 
-        /* Modal Styles */
-        #modal-overlay {
-            backdrop-filter: blur(4px);
-            background-color: rgba(15, 23, 42, 0.4);
-            transition: all 0.3s ease;
-        }
-        .modal-content {
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
-        }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+
+        .stat-card { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease; }
+        .stat-card:hover { transform: scale(1.05) translateY(-5px); z-index: 10; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="flex min-h-screen">
-
-    <aside class="hidden xl:flex flex-col w-60 bg-white border-r border-slate-100 sticky top-0 h-screen z-50">
-        <div class="p-6">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">T</div>
-                <span class="text-lg font-extrabold tracking-tight text-slate-900 italic">Trusmi<span class="text-blue-600">verse</span></span>
-            </div>
-        </div>
-        <nav class="flex-1 px-4 space-y-1">
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 text-blue-700 font-bold text-sm italic"><i class="fas fa-chart-line"></i> Dashboard</a>
-        </nav>
-    </aside>
-
-    <div class="flex-1 flex flex-col min-w-0">
-        <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 h-24 flex items-center px-6 lg:px-10 justify-between sticky top-0 z-40">
-            <h2 class="text-sm lg:text-base font-black text-slate-900 italic uppercase tracking-tight">DASHBOARD REFRESHMENT TRAINING</h2>
-            <div class="flex items-center gap-6">
-                <div class="flex flex-col gap-1.5 items-end">
-                    <div class="text-right">
-                        <p class="text-[10px] font-black text-slate-900 leading-none">Wildani</p>
-                        <p class="text-[8px] font-bold text-slate-400 mt-1">HR Administrator</p>
-                    </div>
-                    <div class="flex items-center gap-2 mt-1">
-                        <select id="filterDivisi" onchange="applyFilters()" class="filter-select">
-                            <option value="all">All Divisi</option>
-                            <option value="Support">Support</option>
-                            <option value="Produksi">Produksi</option>
-                            <option value="Sales & Marketing">Sales & Marketing</option>
-                        </select>
-                        <select id="filterBulan" onchange="applyFilters()" class="filter-select">
-                            <option value="all">Semua Bulan</option>
-                            <option value="1">Januari</option>
-                            <option value="2">Februari</option>
-                            <option value="3">Maret</option>
-                            <option value="4">April</option>
-                            <option value="5">Mei</option>
-                            <option value="6">Juni</option>
-                            <option value="7">Juli</option>
-                            <option value="8">Agustus</option>
-                            <option value="9">September</option>
-                            <option value="10">Oktober</option>
-                            <option value="11">November</option>
-                            <option value="12">Desember</option>
-                        </select>
-                        <div class="flex items-center gap-1">
-                            <input type="date" id="filterStart" onchange="applyFilters()" class="filter-input" title="Start Date">
-                            <span class="text-[10px] font-bold text-slate-400">-</span>
-                            <input type="date" id="filterEnd" onchange="applyFilters()" class="filter-input" title="End Date">
-                        </div>
-                    </div>
-                </div>
-                <img src="https://ui-avatars.com/api/?name=Wildani&background=0f172a&color=fff" class="w-8 h-8 rounded-lg">
-            </div>
-        </header>
-
-        <main class="p-4 lg:p-8 max-w-[1600px] mx-auto w-full space-y-6">
-            
-            <div id="status-message" class="hidden p-4 bg-rose-50 border border-rose-100 text-rose-600 rounded-2xl text-[10px] font-bold uppercase italic animate-pulse">
-                Terjadi kesalahan saat memuat data. Mencoba kembali...
-            </div>
-
-            <div class="stats-grid">
-                <div class="card-stat underperform" onclick="showCardDetail('underperform')">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Underperform</span>
-                        <div class="w-6 h-6 bg-rose-50 text-rose-500 rounded flex items-center justify-center text-[10px]"><i class="fas fa-user-minus"></i></div>
-                    </div>
-                    <span id="stat-underperform" class="text-2xl font-black text-slate-900 mt-2 italic">--</span>
-                    <span class="text-[9px] text-rose-500 font-bold mt-1 uppercase">Nilai KPI < 80%</span>
-                </div>
-                <div class="card-stat tna" onclick="showCardDetail('tna')">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">TNA Selesai</span>
-                        <div class="w-6 h-6 bg-blue-50 text-blue-500 rounded flex items-center justify-center text-[10px]"><i class="fas fa-clipboard-check"></i></div>
-                    </div>
-                    <span id="stat-tna" class="text-2xl font-black mt-2 italic text-blue-600">--</span>
-                    <span id="detail-tna" class="text-[9px] text-slate-400 font-bold mt-1 uppercase">--</span>
-                </div>
-                <div class="card-stat materi" onclick="showCardDetail('materi')">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Materi Siap</span>
-                        <div class="w-6 h-6 bg-amber-50 text-amber-500 rounded flex items-center justify-center text-[10px]"><i class="fas fa-book-open"></i></div>
-                    </div>
-                    <span id="stat-materi" class="text-2xl font-black mt-2 italic text-amber-600">--</span>
-                    <span id="detail-materi" class="text-[9px] text-slate-400 font-bold mt-1 uppercase">--</span>
-                </div>
-                <div class="card-stat approved" onclick="showCardDetail('approved')">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Approved</span>
-                        <div class="w-6 h-6 bg-purple-50 text-purple-500 rounded flex items-center justify-center text-[10px]"><i class="fas fa-check-double"></i></div>
-                    </div>
-                    <span id="stat-approved" class="text-2xl font-black mt-2 italic text-purple-600">--</span>
-                    <span id="detail-approved" class="text-[9px] text-slate-400 font-bold mt-1 uppercase">--</span>
-                </div>
-                <div class="card-stat implemented" onclick="showCardDetail('implemented')">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Implemented</span>
-                        <div class="w-6 h-6 bg-emerald-50 text-emerald-500 rounded flex items-center justify-center text-[10px]"><i class="fas fa-graduation-cap"></i></div>
-                    </div>
-                    <span id="stat-implemented" class="text-2xl font-black mt-2 italic text-emerald-600">--</span>
-                    <span id="detail-implemented" class="text-[9px] text-slate-400 font-bold mt-1 uppercase">--</span>
-                </div>
-                <div class="card-stat growth" onclick="showCardDetail('growth')">
-                    <div class="flex justify-between items-start">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Growth</span>
-                        <div class="w-6 h-6 bg-indigo-50 text-indigo-500 rounded flex items-center justify-center text-[10px]"><i class="fas fa-chart-line"></i></div>
-                    </div>
-                    <span id="stat-growth" class="text-2xl font-black mt-2 italic text-indigo-600">--</span>
-                    <span id="detail-growth" class="text-[9px] text-slate-400 font-bold mt-1 uppercase">--</span>
-                </div>
-            </div>
-
-            <!-- MODAL DETAIL -->
-            <div id="modal-overlay" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-                <div class="modal-content bg-white w-full max-w-5xl rounded-[32px] overflow-hidden">
-                    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-                        <div>
-                            <h3 id="modal-title" class="text-sm font-black text-slate-900 uppercase italic">Detail Data</h3>
-                            <p id="modal-subtitle" class="text-[10px] font-bold text-slate-400 mt-1 uppercase italic tracking-tight"></p>
-                        </div>
-                        <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="flex-1 overflow-auto p-4 italic">
-                        <table class="table-custom w-full" id="modalTable">
-                            <thead id="modal-table-header"></thead>
-                            <tbody id="modal-table-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-12 gap-6">
-                <div class="col-span-12 lg:col-span-7 bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm italic flex flex-col sm:flex-row gap-8 items-center justify-center">
-                    <div class="circle-container flex-shrink-0">
-                        <svg class="w-full h-full transform -rotate-90">
-                            <circle class="circle-bg" cx="80" cy="80" r="68"></circle>
-                            <circle id="circle-progress" class="circle-progress" cx="80" cy="80" r="68" stroke-dasharray="427" stroke-dashoffset="427"></circle>
-                        </svg>
-                        <div class="absolute inset-0 flex flex-col items-center justify-center leading-none">
-                            <span id="stat-total-done" class="text-3xl font-black text-slate-900 italic">0%</span>
-                            <span class="text-[8px] font-bold text-slate-400 uppercase mt-1 tracking-tighter">Overall Completion</span>
-                        </div>
-                    </div>
-                    <div id="progress-list" class="flex-1 space-y-3 w-full max-sm:max-w-sm"></div>
-                </div>
-
-                <div class="col-span-12 lg:col-span-5 bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm italic">
-                    <h3 class="text-[10px] font-black uppercase tracking-widest mb-4 border-b pb-2">Jadwal Mendatang (Plan)</h3>
-                    <div id="jadwal-list" class="space-y-3"></div>
-                    <p id="update-timestamp" class="text-[7px] font-bold text-slate-300 mt-4 uppercase">Syncing...</p>
-                </div>
-            </div>
-
-            <div class="table-wrapper italic shadow-sm">
-                <div class="p-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-3">
-                    <h3 class="text-xs font-black text-slate-900 uppercase">Detail Implementasi (Data_COE)</h3>
-                    <div class="relative w-full sm:w-64">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px]"></i>
-                        <input type="text" id="tableSearch" onkeyup="searchData()" placeholder="Cari..." class="w-full bg-slate-50 border-none rounded-xl py-2 pl-9 pr-4 text-[11px] outline-none">
-                    </div>
-                </div>
-                <div class="table-scroll overflow-x-auto">
-                    <table class="table-custom" id="trainingTable">
-                        <thead id="table-header"></thead>
-                        <tbody id="table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="table-wrapper italic shadow-sm mt-8">
-                <div class="p-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-3">
-                    <h3 class="text-xs font-black text-slate-900 uppercase text-blue-600">Detail Data KPI</h3>
-                    <div class="relative w-full sm:w-64">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px]"></i>
-                        <input type="text" id="kpiSearch" onkeyup="searchKPIData()" placeholder="Cari di Data KPI..." class="w-full bg-slate-50 border-none rounded-xl py-2 pl-9 pr-4 text-[11px] outline-none">
-                    </div>
-                </div>
-                <div class="table-scroll overflow-x-auto">
-                    <table class="table-custom" id="kpiTable">
-                        <thead id="kpi-table-header"></thead>
-                        <tbody id="kpi-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycby0nknigY3PodLjUP3F60ezeRjm_bHjMHu3g18Th96hxha3NBeWAnGvn-8Wg99vm-JR/exec';
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
         
-        let rawData = [];
-        let rawKPIData = [];
-        let filteredKPIGlobal = [];
-        let filteredImpGlobal = [];
-        let sortOrder = {};
-        let fetchController = null;
-
-        // Fungsi normalisasi sederhana (tanpa merge filling)
-        function normalizeData(data) {
-            if (!data || data.length === 0) return data;
-            return data.map(row => {
-                let newRow = { ...row };
-                Object.keys(newRow).forEach(key => {
-                    if (newRow[key] === "" || newRow[key] === null || newRow[key] === undefined) {
-                        newRow[key] = "-";
-                    }
-                });
-                return newRow;
-            });
-        }
-
-        async function fetchData() {
-            if (fetchController) fetchController.abort();
-            fetchController = new AbortController();
-            const signal = fetchController.signal;
-            const statusMsg = document.getElementById('status-message');
-
-            try {
-                const response = await fetch(scriptURL, { 
-                    method: 'GET',
-                    headers: { 'Accept': 'application/json' },
-                    signal: signal 
-                });
-                
-                if (!response.ok) throw new Error('Network response error');
-                
-                const res = await response.json();
-                statusMsg.classList.add('hidden');
-
-                // Menggunakan data asli sesuai sheet tanpa pengisian sel kosong
-                rawData = normalizeData(res.details || []);
-                rawKPIData = normalizeData(res.kpiDetails || []);
-
-                applyFilters(); 
-                document.getElementById('update-timestamp').innerText = 'Sync: ' + new Date().toLocaleTimeString();
-            } catch (error) { 
-                if (error.name !== 'AbortError') {
-                    console.error("Fetch Error:", error);
-                    statusMsg.classList.remove('hidden');
-                    setTimeout(fetchData, 10000); 
+        const Icon = ({ name, className }) => {
+            const iconRef = useRef(null);
+            useEffect(() => {
+                if (window.lucide && iconRef.current) {
+                    window.lucide.createIcons({
+                        attrs: { class: className },
+                        nameAttr: 'data-lucide',
+                        icons: { [name]: window.lucide.icons[name] }
+                    });
                 }
-            }
-        }
+            }, [name, className]);
+            return <i ref={iconRef} data-lucide={name} className={className}></i>;
+        };
 
-        function applyFilters() {
-            const divisi = document.getElementById('filterDivisi').value;
-            const bulan = document.getElementById('filterBulan').value;
-            const start = document.getElementById('filterStart').value;
-            const end = document.getElementById('filterEnd').value;
-
-            const checkFilter = (row) => {
-                const rowDivisi = String(row['Divisi'] || '');
-                const rowBulan = String(row['Bulan'] || '');
-                const rowTanggalStr = row['Tanggal Training'] || row['Plan Start'] || '';
-                
-                const divisiMatch = (divisi === 'all' || rowDivisi === divisi);
-                const bulanMatch = (bulan === 'all' || rowBulan === bulan);
-                let dateValid = true;
-
-                if (start && end && rowTanggalStr && rowTanggalStr !== "-") {
-                    const rDate = new Date(rowTanggalStr);
-                    const sDate = new Date(start);
-                    const eDate = new Date(end);
-                    rDate.setHours(0,0,0,0);
-                    sDate.setHours(0,0,0,0);
-                    eDate.setHours(0,0,0,0);
-                    dateValid = (rDate >= sDate && rDate <= eDate);
-                }
-                return divisiMatch && bulanMatch && dateValid;
-            };
-
-            filteredKPIGlobal = rawKPIData.filter(checkFilter);
+        const App = () => {
+            const [tableData, setTableData] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [searchTerm, setSearchTerm] = useState('');
             
-            if (bulan === 'all') {
-                filteredImpGlobal = rawData.filter(r => divisi === 'all' || String(r['Divisi'] || '') === divisi);
-            } else {
-                const targetBulanNum = parseInt(bulan) + 1 > 12 ? 1 : parseInt(bulan) + 1;
-                filteredImpGlobal = rawData.filter(r => {
-                    const rowDivisi = String(r['Divisi'] || '');
-                    const planStartStr = r['Plan Start'];
-                    if (!planStartStr || planStartStr === "-") return false;
-                    const pDate = new Date(planStartStr);
-                    const mMatch = !isNaN(pDate.getTime()) && (pDate.getMonth() + 1) === targetBulanNum;
-                    const dMatch = (divisi === 'all' || rowDivisi === divisi);
-                    return mMatch && dMatch;
-                });
-            }
-
-            recalculateCards(filteredKPIGlobal, filteredImpGlobal, bulan);
-            renderTable(filteredImpGlobal);
-            renderJadwal(rawData, bulan, divisi); 
-            renderKPITable(filteredKPIGlobal);
-        }
-
-        function parsePercentage(val) {
-            if (val === null || val === undefined || val === "" || val === "-") return null;
-            if (typeof val === 'number') return val;
-            let clean = String(val).replace(/%/g, '').replace(/,/g, '.').trim();
-            let num = parseFloat(clean);
-            if (String(val).includes('%')) return num / 100;
-            return num;
-        }
-
-        function recalculateCards(kpiData, implementasiData, filterBulan) {
-            const getUniqueKey = (id, row) => `${String(id).trim()}_${row['Bulan'] || 'none'}`;
-            const getImpUniqueKey = (row) => {
-                const d = new Date(row['Plan Start']);
-                const m = isNaN(d.getTime()) ? 'none' : (d.getMonth() + 1);
-                return `${String(row['Materi / Modul']).trim()}_${m}`;
-            };
-
-            const underRows = kpiData.filter(r => {
-                const s = parsePercentage(r['Nilai KPI']);
-                return s !== null && s < 0.8;
-            });
-
-            const tnaValidRows = underRows.filter(r => {
-                const mslh = String(r['Akar Masalah (Analisis)'] || '').trim();
-                return mslh !== "" && mslh !== "-" && !mslh.toLowerCase().includes('kompeten');
-            });
-            const listMasalahUnique = [...new Set(tnaValidRows.map(r => getUniqueKey(r['Akar Masalah (Analisis)'], r)))];
-            const x_tna = listMasalahUnique.length;
-            const y_tna = [...new Set(underRows.map(r => getUniqueKey(r['Departement'], r)))].filter(v => v && !v.startsWith('-_') && !v.startsWith('_')).length;
-            const percTna = y_tna > 0 ? (x_tna / y_tna) : 0;
-
-            const listMateriUnique = [...new Set(underRows
-                .filter(r => {
-                    const mat = String(r['Materi Training'] || '').trim();
-                    return mat !== "" && mat !== "-";
-                })
-                .map(r => String(r['Materi Training']).trim().toUpperCase()))];
+            // Set default filter to current month
+            const currentMonth = new Date().getMonth();
+            const [filterPeriode, setFilterPeriode] = useState(String(currentMonth)); 
             
-            const x_materi = listMateriUnique.length;
-            const y_materi = x_tna; 
-            const percMateri = y_materi > 0 ? (x_materi / y_materi) : 0;
+            const [startDate, setStartDate] = useState('');
+            const [endDate, setEndDate] = useState('');
+            const [filterDivisi, setFilterDivisi] = useState('');
+            const [filterLevel, setFilterLevel] = useState('');
+            const [filterDept, setFilterDept] = useState('');
 
-            const listAppUnique = [...new Set(underRows
-                .filter(r => {
-                    const mat = String(r['Materi Training'] || '').trim();
-                    const app = String(r['Approval User'] || '').toUpperCase();
-                    return mat !== "" && mat !== "-" && app === "YA";
-                })
-                .map(r => String(r['Materi Training']).trim().toUpperCase()))];
-            
-            const x_app = listAppUnique.length;
-            const y_app = x_materi; 
-            const percApp = y_app > 0 ? (x_app / y_app) : 0;
+            const [selectedDetail, setSelectedDetail] = useState(null);
 
-            const doneRows = implementasiData.filter(r => ['done', 'selesai', 'complete'].includes(String(r['Status'] || '').toLowerCase()));
-            const x_imp = [...new Set(doneRows.map(r => getImpUniqueKey(r)))].length;
-            const y_imp = x_app; 
-            const percImp = y_imp > 0 ? (x_imp / y_imp) : 0;
+            const SPREADSHEET_URL = "https://script.google.com/macros/s/AKfycbzQ_26DnGGsP2oEiHqAf470AeV_7jqo-jKJ8EXvBE2CxMhtWPJpSJYNQJ3rkeMSgIUW9A/exec";
 
-            const x_growth = kpiData.filter(r => 
-                String(r['Status Performance'] || '').toUpperCase().includes('GROWTH') && 
-                String(r['Training Sebagai Solusi'] || '').toUpperCase() === "YA"
-            ).length;
-            const y_growth = kpiData.filter(r => 
-                String(r['Training Sebagai Solusi'] || '').toUpperCase() === "YA"
-            ).length;
-            const percGrowth = y_growth > 0 ? (x_growth / y_growth) : 0;
-
-            document.getElementById('stat-underperform').innerText = underRows.length;
-            setCard('stat-tna', 'detail-tna', percTna, `${x_tna}/${y_tna}`);
-            setCard('stat-materi', 'detail-materi', percMateri, `${x_materi}/${y_materi}`);
-            setCard('stat-approved', 'detail-approved', percApp, `${x_app}/${y_app}`);
-            setCard('stat-implemented', 'detail-implemented', percImp, `${x_imp}/${y_imp}`);
-            setCard('stat-growth', 'detail-growth', percGrowth, `${x_growth}/${y_growth}`);
-
-            const avg = Math.round(((percTna + percMateri + percApp + percImp + percGrowth) / 5) * 100);
-            document.getElementById('stat-total-done').innerText = avg + '%';
-            document.getElementById('circle-progress').style.strokeDashoffset = 427 - (427 * (avg / 100));
-
-            const metrics = [
-                { label: 'TNA Selesai', val: percTna },
-                { label: 'Materi Siap', val: percMateri },
-                { label: 'Approved', val: percApp },
-                { label: 'Implemented', val: percImp },
-                { label: 'Growth', val: percGrowth }
+            const monthOptions = [
+                { value: '0', label: 'Januari 2026' },
+                { value: '1', label: 'Februari 2026' },
+                { value: '2', label: 'Maret 2026' },
+                { value: '3', label: 'April 2026' },
+                { value: '4', label: 'Mei 2026' },
+                { value: '5', label: 'Juni 2026' },
+                { value: '6', label: 'Juli 2026' },
+                { value: '7', label: 'Agustus 2026' },
+                { value: '8', label: 'September 2026' },
+                { value: '9', label: 'Oktober 2026' },
+                { value: '10', label: 'November 2026' },
+                { value: '11', label: 'Desember 2026' }
             ];
 
-            document.getElementById('progress-list').innerHTML = metrics.map(m => `
-                <div>
-                    <div class="flex justify-between mb-1 text-[8px] font-black uppercase"><span>${m.label}</span><span>${Math.round(m.val * 100)}%</span></div>
-                    <div class="w-full h-1.5 bg-slate-50 rounded-full border border-slate-100 overflow-hidden">
-                        <div class="h-full bg-blue-600 transition-all duration-1000" style="width: ${m.val * 100}%"></div>
+            useEffect(() => {
+                fetch(SPREADSHEET_URL)
+                    .then(res => res.json())
+                    .then(data => {
+                        const formatted = data.map((item, idx) => ({
+                            no: idx + 1,
+                            namaKaryawan: item.namakaryawan || "-",
+                            username: item.username || "-",
+                            divisi: item.divisi || "-",
+                            departement: item.departement || "-",
+                            jabatan: item.jabatan || "-",
+                            levelJabatan: item.leveljabatan || "-",
+                            tanggalJoin: item.tanggaljoin || "-",
+                            statusOnboarding: item.statusonboarding || "Pending",
+                            temuanSLA: item.temuansla || "Oke",
+                            userAtasan: item.useratasan || "-",
+                            picRecruitment: item.picrecruitment || item.pic || item.pic_recruitment || "-",
+                            statusTerakhir: item.statusterakhir || "-"
+                        }));
+                        setTableData(formatted);
+                        setLoading(false);
+                    })
+                    .catch(err => {
+                        console.error("Error fetch data:", err);
+                        setLoading(false);
+                    });
+            }, []);
+
+            const filteredData = useMemo(() => {
+                return tableData.filter(d => {
+                    const matchSearch = searchTerm === '' || Object.values(d).some(v => 
+                        String(v).toLowerCase().includes(searchTerm.toLowerCase())
+                    );
+                    
+                    const matchDivisi = filterDivisi === '' || String(d.divisi).trim() === String(filterDivisi).trim();
+                    const matchLevel = filterLevel === '' || String(d.levelJabatan).trim() === String(filterLevel).trim();
+                    const matchDept = filterDept === '' || String(d.departement).trim() === String(filterDept).trim();
+                    
+                    let matchPeriode = true;
+                    const joinDate = new Date(d.tanggalJoin);
+                    const isValidDate = !isNaN(joinDate.getTime());
+
+                    if (filterPeriode === 'custom') {
+                        if (!isValidDate || !startDate || !endDate) {
+                            matchPeriode = true;
+                        } else {
+                            const start = new Date(startDate);
+                            const end = new Date(endDate);
+                            end.setHours(23, 59, 59);
+                            matchPeriode = joinDate >= start && joinDate <= end;
+                        }
+                    } else if (filterPeriode === 'all') {
+                        matchPeriode = true;
+                    } else {
+                        if (!isValidDate) return false;
+                        const targetMonth = parseInt(filterPeriode);
+                        matchPeriode = joinDate.getMonth() === targetMonth && joinDate.getFullYear() === 2026;
+                    }
+
+                    return matchSearch && matchDivisi && matchLevel && matchDept && matchPeriode;
+                });
+            }, [searchTerm, tableData, filterDivisi, filterLevel, filterDept, filterPeriode, startDate, endDate]);
+
+            const stats = useMemo(() => {
+                const dataSet = filteredData;
+                const totalFiltered = dataSet.length;
+                
+                if (totalFiltered === 0) return { totalRec: 0, total: 0, completed: 0, progress: 0, pending: 0, notJoin: 0, percComp: 0, percProg: 0, percPending: 0, slaIssues: [], funnel: [] };
+
+                const notJoinCount = dataSet.filter(d => String(d.statusOnboarding).toLowerCase() === 'not join').length;
+                const activeParticipants = totalFiltered - notJoinCount;
+
+                const completedCount = dataSet.filter(d => String(d.statusOnboarding).toLowerCase().includes('complet')).length;
+                const inProgressCount = dataSet.filter(d => String(d.statusOnboarding).toLowerCase().includes('progres')).length;
+                const notStartedCount = dataSet.filter(d => String(d.statusOnboarding).toLowerCase().includes('not started')).length;
+
+                const percComp = activeParticipants > 0 ? ((completedCount / activeParticipants) * 100).toFixed(1) : 0;
+                const percProg = activeParticipants > 0 ? ((inProgressCount / activeParticipants) * 100).toFixed(1) : 0;
+                const percPending = activeParticipants > 0 ? ((notStartedCount / activeParticipants) * 100).toFixed(1) : 0;
+
+                const countSLA = (keyword) => dataSet.filter(d => d.temuanSLA && String(d.temuanSLA).toLowerCase().includes(keyword.toLowerCase())).length;
+
+                const slaIssues = [
+                    { label: 'Training In Class', val: countSLA('Training In Class'), key: 'Training In Class' },
+                    { label: 'Assignment', val: countSLA('Assignment'), key: 'Assignment' },
+                    { label: 'Serah Terima User', val: countSLA('Serah Terima'), key: 'Serah Terima' },
+                    { label: 'Onboarding Completed', val: countSLA('On Boarding Comp'), key: 'On Boarding Comp' }
+                ];
+
+                return { 
+                    totalRec: totalFiltered,
+                    total: activeParticipants,
+                    completed: completedCount, 
+                    progress: inProgressCount, 
+                    pending: notStartedCount, 
+                    notJoin: notJoinCount,
+                    percComp, percProg, percPending, slaIssues,
+                    funnel: [
+                        { label: 'List Recruitment', val: totalFiltered, topW: '100%', botW: '85%', color: 'bg-blue-600', filter: 'total_rec' },
+                        { label: 'Training Class', val: activeParticipants, topW: '85%', botW: '70%', color: 'bg-blue-500', filter: 'training' },
+                        { label: 'Assignment', val: dataSet.filter(d => /assignment|complet/i.test(d.statusOnboarding)).length, topW: '70%', botW: '55%', color: 'bg-blue-400', filter: 'assignment' },
+                        { label: 'Serah Terima User', val: dataSet.filter(d => /serah|complet/i.test(d.statusOnboarding)).length, topW: '55%', botW: '40%', color: 'bg-blue-300 text-blue-900', filter: 'serah' },
+                        { label: 'Onboarding Completed', val: completedCount, topW: '40%', botW: '25%', color: 'bg-blue-200 text-blue-800', filter: 'completed' }
+                    ]
+                };
+            }, [filteredData]);
+
+            const needleRotation = (stats.percComp / 100 * 180) - 90;
+            const fillRotation = (stats.percComp / 100 * 180) - 45;
+
+            const uniqueValues = (key) => [...new Set(tableData.map(d => String(d[key]).trim()))].filter(v => v && v !== "-").sort();
+
+            const handleExport = () => {
+                const worksheet = XLSX.utils.json_to_sheet(filteredData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "OnboardingData");
+                XLSX.writeFile(workbook, `Trusmiverse_Onboarding_${new Date().toISOString().split('T')[0]}.xlsx`);
+            };
+
+            const openDetail = (type, extra = "") => {
+                let data = [];
+                let title = "";
+                
+                if (type === 'total_rec') { data = filteredData; title = "Total Kandidat Join (All)"; }
+                else if (type === 'total') { data = filteredData.filter(d => String(d.statusOnboarding).toLowerCase() !== 'not join'); title = "Total Peserta Aktif"; }
+                else if (type === 'completed') { data = filteredData.filter(d => String(d.statusOnboarding).toLowerCase().includes('complet')); title = "Peserta Completed"; }
+                else if (type === 'progress') { data = filteredData.filter(d => String(d.statusOnboarding).toLowerCase().includes('progres')); title = "Peserta In Progress"; }
+                else if (type === 'pending') { data = filteredData.filter(d => String(d.statusOnboarding).toLowerCase().includes('not started')); title = "Peserta Not Started"; }
+                else if (type === 'not_join') { data = filteredData.filter(d => String(d.statusOnboarding).toLowerCase() === 'not join'); title = "Peserta Not Join"; }
+                else if (type === 'training') { data = filteredData.filter(d => String(d.statusOnboarding).toLowerCase() !== 'not join'); title = "Peserta di Tahap Training Class"; }
+                else if (type === 'assignment') { data = filteredData.filter(d => /assignment|complet/i.test(d.statusOnboarding)); title = "Peserta di Tahap Assignment"; }
+                else if (type === 'serah') { data = filteredData.filter(d => /serah|complet/i.test(d.statusOnboarding)); title = "Peserta di Tahap Serah Terima"; }
+                else if (type === 'sla') {
+                    data = filteredData.filter(d => d.temuanSLA && String(d.temuanSLA).toLowerCase().includes(extra.toLowerCase()));
+                    title = `Peserta Lewat SLA: ${extra}`;
+                }
+
+                setSelectedDetail({ title, data });
+            };
+
+            return (
+                <div className="min-h-screen pb-10 relative">
+                    {/* Modal Popup */}
+                    {selectedDetail && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+                            <div className="bg-white rounded-3xl w-[95%] max-w-[95%] max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border">
+                                <div className="p-6 border-b flex items-center justify-between bg-white sticky top-0">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><Icon name="list" className="w-5 h-5" /></div>
+                                        <h2 className="text-xl font-black text-slate-800 tracking-tight uppercase">{selectedDetail.title}</h2>
+                                    </div>
+                                    <button onClick={() => setSelectedDetail(null)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                                        <Icon name="x" className="w-6 h-6 text-slate-400" />
+                                    </button>
+                                </div>
+                                <div className="p-4 overflow-auto custom-scrollbar">
+                                    <table className="w-full text-left border-collapse min-w-[1600px]">
+                                        <thead className="bg-slate-50 text-[0.6rem] font-black text-slate-400 uppercase tracking-widest sticky top-0 z-10">
+                                            <tr>
+                                                <th className="px-4 py-3 border-b">Nama</th>
+                                                <th className="px-4 py-3 border-b">Username</th>
+                                                <th className="px-4 py-3 border-b">Divisi</th>
+                                                <th className="px-4 py-3 border-b">Departement</th>
+                                                <th className="px-4 py-3 border-b">Jabatan</th>
+                                                <th className="px-4 py-3 border-b">Level</th>
+                                                <th className="px-4 py-3 border-b">Tanggal Join</th>
+                                                <th className="px-4 py-3 border-b">Status Onboarding</th>
+                                                <th className="px-4 py-3 border-b">SLA</th>
+                                                <th className="px-4 py-3 border-b">User Atasan</th>
+                                                <th className="px-4 py-3 border-b">PIC Recruitment</th>
+                                                <th className="px-4 py-3 border-b">Status Terakhir</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="text-[0.7rem]">
+                                            {selectedDetail.data.length > 0 ? selectedDetail.data.map((d, i) => (
+                                                <tr key={i} className="border-b hover:bg-blue-50/50">
+                                                    <td className="px-4 py-3 font-black text-blue-900 uppercase">{d.namaKaryawan}</td>
+                                                    <td className="px-4 py-3 text-slate-400 font-mono">{d.username}</td>
+                                                    <td className="px-4 py-3 text-slate-500">{d.divisi}</td>
+                                                    <td className="px-4 py-3 text-slate-400">{d.departement}</td>
+                                                    <td className="px-4 py-3 text-slate-600 font-bold italic">{d.jabatan}</td>
+                                                    <td className="px-4 py-3 text-slate-500 font-black">{d.levelJabatan}</td>
+                                                    <td className="px-4 py-3 text-slate-500 font-mono">{d.tanggalJoin}</td>
+                                                    <td className="px-4 py-3 font-black text-blue-600">{d.statusOnboarding}</td>
+                                                    <td className={`px-4 py-3 font-bold ${d.temuanSLA !== 'Oke' ? 'text-red-500' : 'text-slate-400'}`}>{d.temuanSLA}</td>
+                                                    <td className="px-4 py-3 font-bold text-slate-700">{d.userAtasan}</td>
+                                                    <td className="px-4 py-3 text-slate-400 font-black uppercase">{d.picRecruitment}</td>
+                                                    <td className="px-4 py-3 font-medium italic text-slate-500">{d.statusTerakhir}</td>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="12" className="py-10 text-center text-slate-400 font-bold italic">Tidak ada data ditemukan.</td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="p-4 border-t bg-slate-50 flex justify-end">
+                                    <button onClick={() => setSelectedDetail(null)} className="px-6 py-2 bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-md">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <nav className="bg-white border-b px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+                        <div className="flex items-center gap-2">
+                            <div className="bg-red-600 p-1.5 rounded-lg shadow-lg shadow-red-100"><Icon name="layout-dashboard" className="text-white w-5 h-5" /></div>
+                            <span className="font-extrabold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600">Trusmiverse</span>
+                        </div>
+                        
+                        <div className="flex flex-col items-end">
+                            <div className="text-right">
+                                <p className="font-bold text-xs text-slate-700 leading-none">Admin HR</p>
+                                <p className="text-[0.55rem] text-slate-400 font-black uppercase tracking-widest mt-1">Dashboard Manager</p>
+                            </div>
+                            
+                            <div className="mt-2 flex items-center gap-2 bg-slate-100/80 border border-slate-200 p-1 rounded-lg">
+                                <div className="flex items-center gap-1">
+                                    <select 
+                                        className="bg-transparent border-none text-[0.6rem] font-black outline-none text-slate-600 cursor-pointer uppercase tracking-tighter px-1"
+                                        value={filterPeriode} 
+                                        onChange={(e)=>setFilterPeriode(e.target.value)}
+                                    >
+                                        <option value="all">Semua Data</option>
+                                        {monthOptions.map(m => (
+                                            <option key={m.value} value={m.value}>{m.label}</option>
+                                        ))}
+                                        <option value="custom">Custom Date</option>
+                                    </select>
+                                </div>
+                                
+                                {filterPeriode === 'custom' && (
+                                    <div className="flex items-center gap-1 border-l border-slate-300 pl-1 animate-fadeIn">
+                                        <input 
+                                            type="date" 
+                                            className="bg-transparent border-none text-[0.6rem] font-bold outline-none text-blue-600"
+                                            value={startDate}
+                                            onChange={(e) => setStartDate(e.target.value)}
+                                        />
+                                        <span className="text-[0.5rem] text-slate-400 font-bold uppercase">-</span>
+                                        <input 
+                                            type="date" 
+                                            className="bg-transparent border-none text-[0.6rem] font-bold outline-none text-blue-600"
+                                            value={endDate}
+                                            onChange={(e) => setEndDate(e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </nav>
+                    
+                    {/* MENU HALAMAN TAMBAHAN */}
+                    <div className="bg-white border-b px-6 py-2 flex items-center gap-4">
+                        <a href="index.html" className="text-[0.6rem] font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 pb-1">Dashboard Utama</a>
+                        <a href="halaman2.html" className="text-[0.6rem] font-black uppercase tracking-widest text-slate-400 hover:text-blue-500 transition-colors pb-1">Ke Halaman Dua</a>
                     </div>
+
+                    <main className="max-w-[1440px] mx-auto p-6 space-y-6">
+                        <div className="text-left py-2">
+                            <h1 className="text-lg font-black text-slate-800 tracking-wider uppercase italic">DASHBOARD ONBOARDING TRAINING</h1>
+                            <div className="h-0.5 w-16 bg-red-600 mt-1 rounded-full"></div>
+                        </div>
+
+                        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
+                            {[
+                                { id: 'total_rec', label: 'Kandidat Join', val: stats.totalRec, sub: '(Recruitment)', icon: 'user-plus', color: 'text-indigo-600', borderColor: 'border-l-indigo-600', bgIcon: 'bg-indigo-50' },
+                                { id: 'total', label: 'Total Peserta', val: stats.total, sub: '(Aktif)', icon: 'users', color: 'text-blue-600', borderColor: 'border-l-blue-600', bgIcon: 'bg-blue-50' },
+                                { id: 'completed', label: 'Completed', val: stats.percComp + '%', sub: `(${stats.completed}/${stats.total})`, icon: 'check-circle', color: 'text-emerald-600', borderColor: 'border-l-emerald-600', bgIcon: 'bg-emerald-50' },
+                                { id: 'progress', label: 'In Progress', val: stats.percProg + '%', sub: `(${stats.progress}/${stats.total})`, icon: 'refresh-cw', color: 'text-sky-600', borderColor: 'border-l-sky-600', bgIcon: 'bg-sky-50' },
+                                { id: 'pending', label: 'Not Started', val: stats.percPending + '%', sub: `(${stats.pending}/${stats.total})`, icon: 'clock', color: 'text-amber-600', borderColor: 'border-l-amber-600', bgIcon: 'bg-amber-50' },
+                                { id: 'not_join', label: 'Not Join', val: stats.notJoin, sub: '(Cancel)', icon: 'user-minus', color: 'text-rose-600', borderColor: 'border-l-rose-600', bgIcon: 'bg-rose-50' },
+                            ].map((s, i) => (
+                                <div 
+                                    key={i} 
+                                    onClick={() => openDetail(s.id)}
+                                    className={`bg-white p-5 rounded-xl border border-slate-100 shadow-sm transition-all cursor-pointer relative overflow-hidden border-l-4 ${s.borderColor} stat-card`}
+                                >
+                                    <div className={`absolute -top-1 -right-1 p-3 rounded-bl-2xl ${s.bgIcon} ${s.color} opacity-40`}>
+                                        <Icon name={s.icon} className="w-5 h-5" />
+                                    </div>
+                                    
+                                    <div className={`flex items-center gap-2 text-[0.6rem] font-black uppercase tracking-widest mb-2 ${s.color}`}>
+                                        <Icon name={s.icon} className="w-3 h-3" /> {s.label}
+                                    </div>
+                                    <div className="flex items-baseline gap-2">
+                                        <span className="text-2xl font-black text-slate-800 tracking-tighter">{s.val}</span>
+                                        {s.sub && <span className="text-[0.65rem] text-slate-400 font-bold">{s.sub}</span>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                            <div className="lg:col-span-4 bg-white p-6 rounded-2xl border shadow-sm hover-lift funnel-container overflow-hidden flex flex-col items-center">
+                                <h3 className="text-[0.75rem] font-black text-slate-400 uppercase tracking-widest mb-8 text-center italic underline decoration-blue-200 underline-offset-4 w-full">Onboarding Funnel</h3>
+                                <div className="flex flex-col items-center gap-1 w-full max-w-[320px]">
+                                    {stats.funnel.map((s, i) => {
+                                        const topOffset = (100 - parseFloat(s.topW)) / 2;
+                                        const botOffset = (100 - parseFloat(s.botW)) / 2;
+                                        const clipPath = `polygon(${topOffset}% 0%, ${100 - topOffset}% 0%, ${100 - botOffset}% 100%, ${botOffset}% 100%)`;
+                                        return (
+                                            <div key={i} className="w-full flex items-center justify-center relative funnel-step" onClick={() => openDetail(s.filter)}>
+                                                <div className={`min-h-[50px] py-1 ${s.color} shadow-sm w-full relative overflow-hidden flex items-center justify-center text-white font-extrabold uppercase`} style={{ clipPath }}>
+                                                    <div className="flex flex-col items-center justify-center gap-0 w-full px-2 text-center">
+                                                        <span className="text-[0.5rem] md:text-[0.55rem] opacity-90 leading-tight tracking-tight drop-shadow-md">{s.label}</span>
+                                                        <span className="text-[0.7rem] font-black leading-none drop-shadow-lg">{s.val}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-4 bg-white p-6 rounded-2xl border shadow-sm flex flex-col items-center justify-center hover-lift overflow-hidden">
+                                <h3 className="text-[0.75rem] font-black text-slate-400 uppercase tracking-widest self-start mb-4">Completion Rate</h3>
+                                <div className="gauge-container" onClick={() => openDetail('completed')}>
+                                    <div className="gauge-bg"></div>
+                                    <div className="gauge-fill" style={{ '--fill-rotation': `${fillRotation}deg` }}></div>
+                                    <div className="gauge-needle" style={{ '--needle-rotation': `${needleRotation}deg` }}></div>
+                                    <div className="gauge-center"></div>
+                                    <div className="absolute inset-x-0 bottom-2 text-center">
+                                        <div className="text-3xl font-black text-slate-900 tracking-tighter">{stats.percComp}%</div>
+                                        <p className="text-[0.55rem] font-black text-emerald-500 uppercase tracking-widest mt-1">Efficiency Rate</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="lg:col-span-4 bg-white p-6 rounded-2xl border shadow-sm hover-lift flex flex-col items-center overflow-hidden">
+                                <h3 className="text-[0.75rem] font-black text-slate-400 uppercase tracking-widest mb-6 text-center italic underline decoration-blue-200 underline-offset-4 w-full">Activity Lewat SLA</h3>
+                                <div className="relative h-44 border-l-2 border-b-2 border-slate-100 ml-4 flex items-end justify-around pb-2 w-[90%] mx-auto">
+                                    {stats.slaIssues.map((d, i) => (
+                                        <div key={i} className="flex flex-col items-center group relative h-full justify-end px-1 bar-pink flex-1">
+                                            <div className="mb-1 text-[0.7rem] font-black text-pink-600 bg-pink-50 px-1 rounded-md border border-pink-100 group-hover:scale-125 transition-transform">{d.val}</div>
+                                            <div className="bar-3d-wrapper" onClick={() => openDetail('sla', d.key)}>
+                                                <div className="bar-3d-box" style={{ 
+                                                    height: d.val === 0 ? '4px' : `${Math.min((d.val / (Math.max(...stats.slaIssues.map(v=>v.val)) || 1)) * 80, 80)}%`
+                                                }}></div>
+                                            </div>
+                                            <span className="text-[0.4rem] font-black text-slate-400 uppercase mt-2 text-center leading-tight h-8 flex items-center">{d.label}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+                            <div className="p-3 border-b flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="p-1.5 bg-blue-50 rounded-lg text-blue-600">
+                                        <Icon name="list-checks" className="w-3.5 h-3.5" />
+                                    </div>
+                                    <div>
+                                        <h2 className="font-extrabold text-[0.75rem] uppercase tracking-tight">Onboarding Tracker</h2>
+                                        <p className="text-[0.55rem] text-slate-400 font-bold uppercase tracking-widest">Total: {filteredData.length}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-slate-50/50 p-2 border-b">
+                                <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar whitespace-nowrap">
+                                    <div className="relative w-[220px]">
+                                        <Icon name="search" className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <input 
+                                            type="text" 
+                                            placeholder="Cari Nama..." 
+                                            value={searchTerm} 
+                                            onChange={(e) => setSearchTerm(e.target.value)} 
+                                            className="w-full pl-7 pr-2 py-1 border border-slate-200 bg-white rounded-lg text-[0.6rem] outline-none focus:ring-1 focus:ring-blue-400" 
+                                        />
+                                    </div>
+                                    
+                                    <div className="w-[130px]">
+                                        <select 
+                                            className="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-[0.6rem] font-bold text-slate-600 outline-none" 
+                                            value={filterDivisi} 
+                                            onChange={(e)=>setFilterDivisi(e.target.value)}
+                                        >
+                                            <option value="">Divisi: Semua</option>
+                                            {uniqueValues('divisi').map(v => <option key={v} value={v}>{v}</option>)}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="w-[130px]">
+                                        <select 
+                                            className="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-[0.6rem] font-bold text-slate-600 outline-none" 
+                                            value={filterDept} 
+                                            onChange={(e)=>setFilterDept(e.target.value)}
+                                        >
+                                            <option value="">Dept: Semua</option>
+                                            {uniqueValues('departement').map(v => <option key={v} value={v}>{v}</option>)}
+                                        </select>
+                                    </div>
+                                    
+                                    <div className="w-[130px]">
+                                        <select 
+                                            className="w-full px-2 py-1 bg-white border border-slate-200 rounded-lg text-[0.6rem] font-bold text-slate-600 outline-none" 
+                                            value={filterLevel} 
+                                            onChange={(e)=>setFilterLevel(e.target.value)}
+                                        >
+                                            <option value="">Level: Semua</option>
+                                            {uniqueValues('levelJabatan').map(v => <option key={v} value={v}>{v}</option>)}
+                                        </select>
+                                    </div>
+                                    
+                                    <button 
+                                        onClick={handleExport} 
+                                        className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded-lg text-[0.55rem] font-black uppercase tracking-wider shadow-sm transition-all active:scale-95 ml-auto"
+                                    >
+                                        <Icon name="file-spreadsheet" className="w-3 h-3" /> Export
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="relative overflow-hidden bg-white">
+                                <div className="max-h-[500px] overflow-auto custom-scrollbar">
+                                    <table className="w-full text-left table-auto min-w-[1600px]">
+                                        <thead className="sticky top-0 z-20 bg-slate-50">
+                                            <tr className="text-[0.5625rem] font-black uppercase text-slate-500 border-b">
+                                                <th className="px-4 py-4 bg-slate-50">NO</th>
+                                                <th className="px-4 py-4 bg-slate-50 sticky left-0 z-30 border-r shadow-sm">NAMA KARYAWAN</th>
+                                                <th className="px-4 py-4">USERNAME</th>
+                                                <th className="px-4 py-4 text-center">DIVISI</th>
+                                                <th className="px-4 py-4">DEPARTEMENT</th>
+                                                <th className="px-4 py-4">JABATAN</th>
+                                                <th className="px-4 py-4">LEVEL</th>
+                                                <th className="px-4 py-4">TANGGAL JOIN</th>
+                                                <th className="px-4 py-4">STATUS ONBOARDING</th>
+                                                <th className="px-4 py-4">TEMUAN SLA</th>
+                                                <th className="px-4 py-4">USER ATASAN</th>
+                                                <th className="px-4 py-4">PIC RECRUITMENT</th>
+                                                <th className="px-4 py-4">STATUS TERAKHIR</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100 text-[0.6875rem]">
+                                            {loading ? (
+                                                <tr><td colSpan="13" className="text-center py-20 font-bold text-slate-400 animate-pulse uppercase tracking-widest">SINKRONISASI DATABASE TRUSMIVERSE...</td></tr>
+                                            ) : filteredData.length === 0 ? (
+                                                <tr><td colSpan="13" className="text-center py-20 font-bold text-slate-400 italic">Data tidak ditemukan untuk periode ini.</td></tr>
+                                            ) : filteredData.map((row, i) => (
+                                                <tr key={i} className="hover:bg-blue-50/40 transition-all group">
+                                                    <td className="px-4 py-4 font-bold text-slate-300">{row.no}</td>
+                                                    <td className="px-4 py-4 font-black text-blue-900 sticky left-0 z-10 bg-white group-hover:bg-blue-50 transition-colors border-r shadow-sm uppercase">{row.namaKaryawan}</td>
+                                                    <td className="px-4 py-4 font-mono text-slate-400">{row.username}</td>
+                                                    <td className="px-4 py-4 text-slate-500 font-medium text-center">{row.divisi}</td>
+                                                    <td className="px-4 py-4 text-slate-400">{row.departement}</td>
+                                                    <td className="px-4 py-4 text-slate-600 font-bold italic">{row.jabatan}</td>
+                                                    <td className="px-4 py-4 text-slate-500 font-black">{row.levelJabatan}</td>
+                                                    <td className="px-4 py-4 font-mono text-slate-500">{row.tanggalJoin}</td>
+                                                    <td className="px-4 py-4">
+                                                        <span className={`px-2 py-0.5 rounded-full font-black text-[0.5rem] uppercase border ${
+                                                            String(row.statusOnboarding).toLowerCase().includes('complet') ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                                                            String(row.statusOnboarding).toLowerCase().includes('train') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                                                            String(row.statusOnboarding).toLowerCase().includes('not join') ? 'bg-red-50 text-red-600 border-red-100' :
+                                                            'bg-amber-50 text-amber-600 border-amber-100'
+                                                        }`}>{row.statusOnboarding}</span>
+                                                    </td>
+                                                    <td className="px-4 py-4 font-bold">
+                                                        <span className={row.temuanSLA !== 'Oke' ? 'text-red-500 flex items-center gap-1' : 'text-slate-600'}>
+                                                            {row.temuanSLA !== 'Oke' && <Icon name="alert-circle" className="w-3 h-3" />}
+                                                            {row.temuanSLA}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-4 font-bold text-slate-700">{row.userAtasan}</td>
+                                                    <td className="px-4 py-4 text-slate-400 font-black uppercase text-[0.6rem]">{row.picRecruitment}</td>
+                                                    <td className="px-4 py-4 font-medium italic text-slate-500">{row.statusTerakhir}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
                 </div>
-            `).join('');
+            );
+        };
+
+        const container = document.getElementById('root');
+        if (container) {
+            const root = ReactDOM.createRoot(container);
+            root.render(<App />);
         }
-
-        function setCard(id, detailId, val, info) {
-            const el = document.getElementById(id);
-            const det = document.getElementById(detailId);
-            if(el) el.innerText = Math.round(val * 100) + '%';
-            if(det) det.innerText = info;
-        }
-
-        function showCardDetail(type) {
-            const overlay = document.getElementById('modal-overlay');
-            const title = document.getElementById('modal-title');
-            const subtitle = document.getElementById('modal-subtitle');
-            const tableHeader = document.getElementById('modal-table-header');
-            const tableBody = document.getElementById('modal-table-body');
-            
-            let displayData = [];
-            let headerKeys = [];
-
-            switch(type) {
-                case 'underperform':
-                    title.innerText = 'Detail Underperform';
-                    subtitle.innerText = 'Karyawan dengan Nilai KPI < 80%';
-                    displayData = filteredKPIGlobal.filter(r => parsePercentage(r['Nilai KPI']) < 0.8);
-                    break;
-                case 'tna':
-                    title.innerText = 'Detail TNA Selesai';
-                    subtitle.innerText = 'Analisis Akar Masalah yang telah diidentifikasi';
-                    displayData = filteredKPIGlobal.filter(r => {
-                        const mslh = String(r['Akar Masalah (Analisis)'] || '').trim();
-                        return parsePercentage(r['Nilai KPI']) < 0.8 && mslh !== "" && mslh !== "-" && !mslh.toLowerCase().includes('kompeten');
-                    });
-                    break;
-                case 'materi':
-                    title.innerText = 'Detail Materi Siap';
-                    subtitle.innerText = 'Materi training yang sudah tersedia';
-                    displayData = filteredKPIGlobal.filter(r => {
-                        const mat = String(r['Materi Training'] || '').trim();
-                        const sol = String(r['Training Sebagai Solusi'] || '').toUpperCase();
-                        return parsePercentage(r['Nilai KPI']) < 0.8 && mat !== "" && mat !== "-" && sol === "YA";
-                    });
-                    break;
-                case 'approved':
-                    title.innerText = 'Detail Approved';
-                    subtitle.innerText = 'Materi yang telah disetujui oleh User';
-                    displayData = filteredKPIGlobal.filter(r => {
-                        const app = String(r['Approval User'] || '').toUpperCase();
-                        const sol = String(r['Training Sebagai Solusi'] || '').toUpperCase();
-                        return app === "YA" && sol === "YA";
-                    });
-                    break;
-                case 'implemented':
-                    title.innerText = 'Detail Implemented';
-                    subtitle.innerText = 'Data Training yang sudah selesai dilaksanakan';
-                    displayData = filteredImpGlobal.filter(r => {
-                        const sv = String(r['Status'] || '').toLowerCase();
-                        return ['done', 'selesai', 'complete'].includes(sv);
-                    });
-                    break;
-                case 'growth':
-                    title.innerText = 'Detail Growth';
-                    subtitle.innerText = 'Karyawan yang mengalami kenaikan performa (Growth)';
-                    displayData = filteredKPIGlobal.filter(r => {
-                        const perf = String(r['Status Performance'] || '').toUpperCase();
-                        const sol = String(r['Training Sebagai Solusi'] || '').toUpperCase();
-                        return perf.includes('GROWTH') && sol === "YA";
-                    });
-                    break;
-            }
-
-            if (displayData.length > 0) {
-                headerKeys = Object.keys(displayData[0]);
-                tableHeader.innerHTML = `<tr>${headerKeys.map(k => `<th>${k}</th>`).join('')}</tr>`;
-                tableBody.innerHTML = displayData.map(row => `<tr>${headerKeys.map(k => `<td>${row[k] || '-'}</td>`).join('')}</tr>`).join('');
-            } else {
-                tableHeader.innerHTML = '';
-                tableBody.innerHTML = '<tr><td colspan="100%" class="text-center py-8 text-slate-400">Tidak ada data untuk ditampilkan</td></tr>';
-            }
-
-            overlay.classList.remove('hidden');
-            overlay.classList.add('flex');
-        }
-
-        function closeModal() {
-            const overlay = document.getElementById('modal-overlay');
-            overlay.classList.add('hidden');
-            overlay.classList.remove('flex');
-        }
-
-        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-
-        function renderTable(data) {
-            const tableBody = document.getElementById('table-body');
-            const tableHeader = document.getElementById('table-header');
-            if (!data.length) {
-                tableBody.innerHTML = "<tr><td colspan='100%' class='text-center py-4 text-slate-400'>Data tidak ditemukan</td></tr>";
-                return;
-            }
-            const keys = Object.keys(data[0]);
-            tableHeader.innerHTML = `<tr>${keys.map(k => `<th onclick="sortTable('training', '${k}')">${k} <i class="fas fa-sort text-[8px] ml-1 opacity-50"></i></th>`).join('')}</tr>`;
-            let h = "";
-            data.forEach((row) => {
-                h += "<tr>";
-                keys.forEach(k => {
-                    const v = row[k];
-                    if (k === 'Status') {
-                        const sv = String(v).toLowerCase();
-                        let scs = sv === 'plan' ? 'bg-amber-100 text-amber-700' : (['done','selesai','complete'].includes(sv) ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600');
-                        h += `<td class="text-center"><span class="px-2 py-0.5 rounded-full font-bold text-[8px] uppercase ${scs}">${v}</span></td>`;
-                    } else h += `<td>${v}</td>`;
-                });
-                h += "</tr>";
-            });
-            tableBody.innerHTML = h;
-        }
-
-        function renderKPITable(data) {
-            const tableBody = document.getElementById('kpi-table-body');
-            const tableHeader = document.getElementById('kpi-table-header');
-            if (!data.length) {
-                tableBody.innerHTML = "<tr><td colspan='100%' class='text-center py-4 text-slate-400'>Data tidak ditemukan</td></tr>";
-                return;
-            }
-            const keys = Object.keys(data[0]);
-            tableHeader.innerHTML = `<tr>${keys.map(k => `<th onclick="sortTable('kpi', '${k}')">${k} <i class="fas fa-sort text-[8px] ml-1 opacity-50"></i></th>`).join('')}</tr>`;
-            let h = "";
-            data.forEach(row => {
-                h += "<tr>";
-                keys.forEach(k => {
-                    const v = row[k];
-                    const lv = String(v).toLowerCase();
-                    const score = parsePercentage(v);
-
-                    if (k === 'Nilai KPI' && score !== null && score < 0.8) h += `<td><span class="text-rose-600 font-bold">${v}</span></td>`;
-                    else if (lv.includes('growth') || lv === 'ya') h += `<td class="text-center"><span class="px-2 py-0.5 rounded-full font-bold text-[8px] uppercase bg-emerald-100 text-emerald-700">${v}</span></td>`;
-                    else if (lv === 'tidak growth' || lv === 'tidak') h += `<td class="text-center"><span class="px-2 py-0.5 rounded-full font-bold text-[8px] uppercase bg-rose-100 text-rose-700">${v}</span></td>`;
-                    else h += `<td>${v}</td>`;
-                });
-                h += "</tr>";
-            });
-            tableBody.innerHTML = h;
-        }
-
-        function renderJadwal(sourceData, filterBulan, filterDivisi) {
-            let plans = [];
-            const checkBase = (r) => {
-                const rowDivisi = String(r['Divisi'] || '');
-                const dMatch = (filterDivisi === 'all' || rowDivisi === filterDivisi);
-                const sMatch = String(r.Status).toLowerCase() === 'plan';
-                return dMatch && sMatch;
-            }
-
-            if (filterBulan === 'all') {
-                plans = sourceData.filter(checkBase);
-            } else {
-                const targetBulanNum = parseInt(filterBulan) + 1 > 12 ? 1 : parseInt(filterBulan) + 1;
-                plans = sourceData.filter(r => {
-                    if (!checkBase(r)) return false;
-                    const planStartStr = r['Plan Start'];
-                    if (!planStartStr || planStartStr === "-") return false;
-                    const pDate = new Date(planStartStr);
-                    return !isNaN(pDate.getTime()) && (pDate.getMonth() + 1) === targetBulanNum;
-                });
-            }
-            
-            const displayPlans = plans.slice(0, 5);
-            document.getElementById('jadwal-list').innerHTML = displayPlans.length ? displayPlans.map(p => {
-                const d = new Date(p['Plan Start']);
-                return `
-                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex items-center gap-3">
-                    <div class="w-9 h-9 bg-blue-600 rounded-lg flex flex-col items-center justify-center text-white text-[8px] font-black">
-                        <span>${isNaN(d.getTime()) ? '?' : d.getDate()}</span>
-                        <span class="uppercase">${isNaN(d.getTime()) ? '-' : d.toLocaleDateString('id-ID', {month:'short'})}</span>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[9px] font-black text-slate-900 uppercase truncate">${p['Materi / Modul'] || '-'}</p>
-                        <p class="text-[8px] font-bold text-blue-600 uppercase truncate">${p.Departemen || '-'} | ${p['Plan Trainer'] || '-'}</p>
-                    </div>
-                    <button onclick="sendBlast('${p['Materi / Modul']}', '${p['Plan Start']}', '${p.Departemen}')" class="btn-wa px-3 py-2 rounded-lg text-[9px] font-black"><i class="fab fa-whatsapp"></i> Blasting</button>
-                </div>`;
-            }).join('') : '<p class="text-[9px] text-slate-400 text-center py-2">Tidak ada jadwal mendatang</p>';
-        }
-
-        function sendBlast(m, w, d) {
-            const t = `*UNDANGAN TRAINING REFRESHMENT*%0A%0A*Materi:* ${m}%0A*Waktu:* ${w.split('T')[0]}%0A*Dept:* ${d}`;
-            window.open(`https://api.whatsapp.com/send?text=${t}`, '_blank');
-        }
-
-        function sortTable(type, key) {
-            const targetData = type === 'training' ? rawData : rawKPIData;
-            const renderFn = type === 'training' ? renderTable : renderKPITable;
-            sortOrder[key] = sortOrder[key] === 'asc' ? 'desc' : 'asc';
-            
-            targetData.sort((a, b) => {
-                let valA = a[key] === null || a[key] === undefined ? "" : a[key].toString();
-                let valB = b[key] === null || b[key] === undefined ? "" : b[key].toString();
-                const numA = parseFloat(valA.replace(/[%,]/g, ''));
-                const numB = parseFloat(valB.replace(/[%,]/g, ''));
-                if (!isNaN(numA) && !isNaN(numB)) return sortOrder[key] === 'asc' ? numA - numB : numB - numA;
-                return sortOrder[key] === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            });
-            renderFn(targetData);
-        }
-
-        function searchData() {
-            const s = document.getElementById('tableSearch').value.toLowerCase();
-            renderTable(rawData.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(s))));
-        }
-
-        function searchKPIData() {
-            const s = document.getElementById('kpiSearch').value.toLowerCase();
-            renderKPITable(rawKPIData.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(s))));
-        }
-
-        window.onload = fetchData;
-        setInterval(fetchData, 60000); 
     </script>
 </body>
 </html>
